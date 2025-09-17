@@ -2,7 +2,6 @@
 
 An AI-powered application builder that transforms your ideas into fully functional Next.js applications in seconds. Built with Next.js 15, TypeScript, Tailwind CSS, shadcn/ui, and powered by LangChain + Anthropic Claude.
 
-![AI Builder Demo](https://via.placeholder.com/800x400/3b82f6/ffffff?text=AI+Builder+Demo)
 
 ## 🚀 Features
 
