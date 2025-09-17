@@ -1,14 +1,68 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 
+// Types for Figma-style design elements
+export interface FigmaElement {
+  id: string
+  type: 'text' | 'rectangle' | 'button' | 'image'
+  content?: string
+  x: number
+  y: number
+  width: number
+  height: number
+  fontSize?: number
+  fontWeight?: string
+  color?: string
+  backgroundColor?: string
+  borderRadius?: number
+  border?: {
+    width: number
+    color: string
+  }
+  textColor?: string
+  fontFamily?: string
+  lineHeight?: number
+}
+
+export interface FigmaFrame {
+  id: string
+  name: string
+  x: number
+  y: number
+  width: number
+  height: number
+  backgroundColor: string
+  elements: FigmaElement[]
+}
+
 // Types for our application state
 export interface DesignSpec {
   id: string
   prompt: string
   description: string
-  components: ComponentSpec[]
+  components?: ComponentSpec[]
   styling: StyleSpec
   layout: string
+  artboardSize?: {
+    width: number
+    height: number
+    name: string
+  }
+  frames?: FigmaFrame[]
+  textStyles?: {
+    heading1: { fontSize: number; fontWeight: string; lineHeight: number }
+    heading2: { fontSize: number; fontWeight: string; lineHeight: number }
+    heading3: { fontSize: number; fontWeight: string; lineHeight: number }
+    body: { fontSize: number; fontWeight: string; lineHeight: number }
+    caption: { fontSize: number; fontWeight: string; lineHeight: number }
+  }
+  placeholderTexts?: {
+    headings: string[]
+    descriptions: string[]
+    buttons: string[]
+    navigation: string[]
+    content: string[]
+  }
   createdAt: Date
   status: 'generating' | 'completed' | 'approved' | 'rejected'
 }
@@ -27,10 +81,17 @@ export interface StyleSpec {
     primary: string
     secondary: string
     accent: string
+    background?: string
+    surface?: string
+    text?: string
+    textSecondary?: string
   }
   typography: {
     fontFamily: string
     scale: 'sm' | 'md' | 'lg'
+    headingSize?: string
+    bodySize?: string
+    captionSize?: string
   }
 }
 

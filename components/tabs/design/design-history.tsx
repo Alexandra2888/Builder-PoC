@@ -62,7 +62,7 @@ export function DesignHistory() {
                       </Badge>
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Layers className="h-3 w-3" />
-                        {design.components.length}
+                        {design.components?.length || design.frames?.length || 0}
                       </div>
                     </div>
                   </div>

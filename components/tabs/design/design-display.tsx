@@ -131,10 +131,10 @@ export function DesignDisplay({ design }: DesignDisplayProps) {
             <div>
               <h4 className="font-semibold mb-2 flex items-center gap-2">
                 <Layers className="h-4 w-4" />
-                Components ({design.components.length})
+                Components ({design.components?.length || design.frames?.length || 0})
               </h4>
               <div className="space-y-2">
-                {design.components.map((component) => (
+                {(design.components || []).map((component) => (
                   <div key={component.id} className="p-3 border rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-medium text-sm">{component.name}</span>

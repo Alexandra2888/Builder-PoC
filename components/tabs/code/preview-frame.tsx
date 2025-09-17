@@ -82,7 +82,7 @@ export function PreviewFrame({ project }: PreviewFrameProps) {
                 {/* Mobile Content - Stacked */}
                 <div className="flex-1 p-3 space-y-3 overflow-auto">
                   {/* Stats Cards - Single Column */}
-                  {designSpec.components.slice(0, 2).map((comp) => (
+                  {(designSpec.components || []).slice(0, 2).map((comp) => (
                     <div key={comp.id} className="bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm border">
                       <div className="h-16 bg-gradient-to-br from-blue-50 to-indigo-100 rounded mb-2"></div>
                       <div className="h-3 bg-gray-200 dark:bg-gray-600 rounded mb-1"></div>
@@ -125,7 +125,7 @@ export function PreviewFrame({ project }: PreviewFrameProps) {
                 {/* Collapsible Sidebar */}
                 <div className="w-48 bg-white dark:bg-gray-800 border-r p-4">
                   <div className="space-y-2">
-                    {designSpec.components.slice(0, 4).map((comp, i) => (
+                    {(designSpec.components || []).slice(0, 4).map((comp, i) => (
                       <div 
                         key={comp.id} 
                         className={`p-2 rounded text-sm ${
@@ -142,7 +142,7 @@ export function PreviewFrame({ project }: PreviewFrameProps) {
                 {/* Tablet Content - 2 Column Grid */}
                 <div className="flex-1 p-4">
                   <div className="grid grid-cols-2 gap-4 mb-4">
-                    {designSpec.components.slice(0, 4).map((comp) => (
+                    {(designSpec.components || []).slice(0, 4).map((comp) => (
                       <div key={comp.id} className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border">
                         <div className="h-16 bg-gradient-to-br from-blue-50 to-indigo-100 rounded mb-2"></div>
                         <div className="h-3 bg-gray-200 dark:bg-gray-600 rounded mb-1"></div>
@@ -172,7 +172,7 @@ export function PreviewFrame({ project }: PreviewFrameProps) {
               <div className="flex h-[calc(100%-64px)]">
                 <div className="w-64 bg-white dark:bg-gray-800 border-r p-4">
                   <div className="space-y-2">
-                    {designSpec.components.slice(0, 4).map((comp, i) => (
+                    {(designSpec.components || []).slice(0, 4).map((comp, i) => (
                       <div 
                         key={comp.id} 
                         className={`p-2 rounded text-sm ${
@@ -188,7 +188,7 @@ export function PreviewFrame({ project }: PreviewFrameProps) {
 
                 <div className="flex-1 p-6">
                   <div className="grid grid-cols-3 gap-4 mb-6">
-                    {designSpec.components.slice(0, 3).map((comp) => (
+                    {(designSpec.components || []).slice(0, 3).map((comp) => (
                       <div key={comp.id} className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border">
                         <div 
                           className="h-20 rounded mb-2"
@@ -248,10 +248,10 @@ export function PreviewFrame({ project }: PreviewFrameProps) {
             <div className="h-1/2 p-8">
               <div className="text-center mb-6">
                 <h2 className="text-2xl font-bold mb-2">Features</h2>
-                <p className="text-gray-600">Built with {designSpec.components.length} components</p>
+                <p className="text-gray-600">Built with {designSpec.components?.length || designSpec.frames?.length || 0} components</p>
               </div>
               <div className="grid grid-cols-3 gap-4 h-full">
-                {designSpec.components.slice(0, 3).map((comp) => (
+                {(designSpec.components || []).slice(0, 3).map((comp) => (
                   <div key={comp.id} className="text-center">
                     <div 
                       className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
@@ -297,7 +297,7 @@ export function PreviewFrame({ project }: PreviewFrameProps) {
             {/* Product grid */}
             <div className="p-6">
               <div className="grid grid-cols-3 gap-4">
-                {designSpec.components.slice(0, 6).map((comp, i) => (
+                {(designSpec.components || []).slice(0, 6).map((comp, i) => (
                   <div key={comp.id} className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
                     <div 
                       className="h-32 rounded mb-2"
@@ -337,7 +337,7 @@ export function PreviewFrame({ project }: PreviewFrameProps) {
                 {layout.charAt(0).toUpperCase() + layout.slice(1)} Layout
               </p>
               <p className="text-sm text-gray-500">
-                {designSpec.components.length} components • {styling.theme} theme
+                {designSpec.components?.length || designSpec.frames?.length || 0} components • {styling.theme} theme
               </p>
               <div className="flex items-center justify-center gap-2 mt-4">
                 <CheckCircle className="h-4 w-4 text-green-500" />

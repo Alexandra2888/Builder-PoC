@@ -123,7 +123,7 @@ export function ApprovalPanel({ design, onApprove, onReject, onRequestChanges }:
         <div className="grid grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
           <div className="text-center">
             <div className="text-2xl font-bold text-primary">
-              {design.components.length}
+              {design.components?.length || design.frames?.length || 0}
             </div>
             <div className="text-xs text-muted-foreground">Components</div>
           </div>
@@ -180,9 +180,9 @@ export function ApprovalPanel({ design, onApprove, onReject, onRequestChanges }:
 
             {/* Components List */}
             <div className="p-3 bg-muted/30 rounded-lg">
-              <div className="text-sm font-medium mb-2">Components ({design.components.length})</div>
+              <div className="text-sm font-medium mb-2">Components ({design.components?.length || design.frames?.length || 0})</div>
               <div className="space-y-1 max-h-32 overflow-y-auto">
-                {design.components.map((comp) => (
+                {(design.components || []).map((comp) => (
                   <div key={comp.id} className="flex items-center justify-between text-xs">
                     <span>{comp.name}</span>
                     <Badge variant="outline" className="text-xs">

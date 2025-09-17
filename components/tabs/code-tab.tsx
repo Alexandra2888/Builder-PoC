@@ -72,7 +72,7 @@ export function CodeTab() {
               <li>• TypeScript configuration</li>
               <li>• Tailwind CSS styling</li>
               <li>• shadcn/ui components</li>
-              <li>• {currentDesign.components.length} custom components</li>
+              <li>• {currentDesign.components?.length || currentDesign.frames?.length || 0} custom components</li>
               <li>• {currentDesign.layout} layout structure</li>
             </ul>
           </div>

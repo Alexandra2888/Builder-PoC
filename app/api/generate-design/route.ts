@@ -12,60 +12,153 @@ const model = new ChatAnthropic({
   maxTokens: 4000,
 })
 
-// Design generation prompt template
+// Design generation prompt template for Figma-like designs
 const designPrompt = PromptTemplate.fromTemplate(`
-You are an expert UI/UX designer and React developer. Your task is to analyze a user's app description and create a comprehensive design specification.
+You are an expert UI/UX designer creating Figma-style design specifications. Your task is to analyze a user's app description and create a comprehensive design with proper placeholder text, frames, and components as would appear in Figma.
 
 User's App Description:
 {prompt}
 
 IMPORTANT: If the user requests changes to a previous design (indicated by phrases like "change the color", "make it more blue", "different layout", etc.), pay special attention to those specific change requests and ensure they are fully implemented in the new design.
 
-Please create a detailed design specification in the following JSON format:
+Create a detailed Figma-style design specification in the following JSON format:
 {{
   "description": "A comprehensive description of the design concept and approach",
   "layout": "Choose from: dashboard, landing-page, blog, e-commerce, portfolio, admin-panel, or app",
+  "artboardSize": {{
+    "width": 1440,
+    "height": 1024,
+    "name": "Desktop"
+  }},
   "styling": {{
     "theme": "Choose from: light, dark, or system",
     "colorPalette": {{
       "primary": "hex color code (main brand color)",
       "secondary": "hex color code (complementary color)", 
-      "accent": "hex color code (highlight/action color)"
+      "accent": "hex color code (highlight/action color)",
+      "background": "hex color code (background color)",
+      "surface": "hex color code (card/surface color)",
+      "text": "hex color code (primary text color)",
+      "textSecondary": "hex color code (secondary text color)"
     }},
     "typography": {{
-      "fontFamily": "font name",
-      "scale": "Choose from: sm, md, lg"
+      "fontFamily": "Inter, system-ui, sans-serif",
+      "scale": "Choose from: sm, md, lg",
+      "headingSize": "text size for headings",
+      "bodySize": "text size for body text",
+      "captionSize": "text size for captions"
     }}
   }},
-  "components": [
+  "frames": [
     {{
-      "id": "unique-id",
-      "type": "component-type",
-      "name": "ComponentName",
-      "props": {{
-        "key": "value"
-      }},
-      "children": []
+      "id": "frame-1",
+      "name": "Main Frame",
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 1024,
+      "backgroundColor": "#FFFFFF",
+      "elements": [
+        {{
+          "id": "element-1",
+          "type": "text",
+          "content": "Actual placeholder text like 'Welcome to Dashboard' or 'Product Title'",
+          "x": 100,
+          "y": 50,
+          "width": 300,
+          "height": 40,
+          "fontSize": 32,
+          "fontWeight": "600",
+          "color": "#1F2937",
+          "fontFamily": "Inter"
+        }},
+        {{
+          "id": "element-2",
+          "type": "rectangle",
+          "x": 100,
+          "y": 120,
+          "width": 400,
+          "height": 200,
+          "backgroundColor": "#F3F4F6",
+          "borderRadius": 8,
+          "border": {{
+            "width": 1,
+            "color": "#E5E7EB"
+          }}
+        }},
+        {{
+          "id": "element-3",
+          "type": "text",
+          "content": "Realistic placeholder like 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor.'",
+          "x": 120,
+          "y": 200,
+          "width": 360,
+          "height": 60,
+          "fontSize": 16,
+          "fontWeight": "400",
+          "color": "#6B7280",
+          "fontFamily": "Inter",
+          "lineHeight": 1.5
+        }},
+        {{
+          "id": "element-4",
+          "type": "button",
+          "content": "Get Started",
+          "x": 120,
+          "y": 280,
+          "width": 140,
+          "height": 40,
+          "backgroundColor": "#3B82F6",
+          "textColor": "#FFFFFF",
+          "borderRadius": 6,
+          "fontSize": 14,
+          "fontWeight": "500"
+        }}
+      ]
     }}
-  ]
+  ],
+  "textStyles": {{
+    "heading1": {{ "fontSize": 48, "fontWeight": "700", "lineHeight": 1.2 }},
+    "heading2": {{ "fontSize": 36, "fontWeight": "600", "lineHeight": 1.3 }},
+    "heading3": {{ "fontSize": 24, "fontWeight": "600", "lineHeight": 1.4 }},
+    "body": {{ "fontSize": 16, "fontWeight": "400", "lineHeight": 1.6 }},
+    "caption": {{ "fontSize": 14, "fontWeight": "400", "lineHeight": 1.5 }}
+  }},
+  "placeholderTexts": {{
+    "headings": ["Welcome to Our Platform", "Create Something Amazing", "Your Journey Starts Here"],
+    "descriptions": [
+      "Transform your ideas into reality with our powerful tools and intuitive interface.",
+      "Join thousands of users who trust our platform for their creative projects.",
+      "Experience the perfect blend of functionality and beautiful design."
+    ],
+    "buttons": ["Get Started", "Learn More", "Sign Up", "Try Now", "Explore"],
+    "navigation": ["Home", "About", "Services", "Contact", "Dashboard", "Profile"],
+    "content": [
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+      "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+    ]
+  }}
 }}
 
-Design Guidelines:
-- Create modern, clean, and responsive designs
-- Use semantic HTML and accessible components
-- Follow React best practices
-- Choose appropriate shadcn/ui components
-- Ensure the design matches the user's requirements
-- Create a logical component hierarchy
-- Include proper color schemes and typography
-- Make it production-ready
+Design Guidelines for Figma-style Output:
+- Use realistic placeholder text that matches the design purpose
+- Include actual measurements (x, y, width, height) for precise positioning
+- Specify exact colors in hex format
+- Use proper typography hierarchy with specific font sizes and weights
+- Create frame-based layouts as Figma does
+- Include text styles for consistency
+- Add realistic button labels and navigation items
+- Use proper spacing and alignment
+- Include background colors and surface styles
+- Make elements look like real Figma components with proper styling
 
-Focus on creating a design that is:
-1. User-friendly and intuitive
-2. Visually appealing and modern
-3. Technically feasible with Next.js + Tailwind + shadcn/ui
-4. Responsive across devices
-5. Accessible and semantic
+Focus on creating a design that:
+1. Has realistic placeholder content
+2. Uses proper Figma-style measurements and positioning
+3. Includes comprehensive text styles and color schemes
+4. Has frame-based organization
+5. Contains actionable and meaningful placeholder text
 
 Please respond with ONLY the JSON specification, no additional text or explanation.
 `)
@@ -113,8 +206,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate required fields
-    const requiredFields = ['description', 'layout', 'styling', 'components']
+    // Validate required fields for Figma-style design
+    const requiredFields = ['description', 'layout', 'styling']
     const missingFields = requiredFields.filter(field => !designSpec[field])
     
     if (missingFields.length > 0) {
@@ -125,12 +218,21 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Add metadata
+    // Validate Figma-style structure
+    if (!designSpec.frames && !designSpec.components) {
+      console.error('Design spec must have either frames or components')
+      return NextResponse.json(
+        { error: 'Design specification must include either frames or components' },
+        { status: 500 }
+      )
+    }
+
+    // Add metadata and ensure proper date format
     const enhancedDesignSpec = {
       id: `design-${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${Math.floor(Math.random() * 1000)}`,
       prompt,
       ...designSpec,
-      createdAt: new Date().toISOString(),
+      createdAt: new Date(),
       status: 'completed' as const
     }
 

@@ -11,6 +11,7 @@ import { Loader2, Wand2, CheckCircle } from 'lucide-react'
 import { DesignMockup } from '@/components/tabs/design/design-mockup'
 import { ApprovalPanel } from '@/components/tabs/design/approval-panel'
 import { DesignHistory } from '@/components/tabs/design/design-history'
+import { ExportInfo } from '@/components/tabs/design/export-info'
 
 export function DesignTab() {
   const {
@@ -122,12 +123,15 @@ export function DesignTab() {
       </div>
 
       {/* Right Column - Approval Panel */}
-      <div>
+      <div className="space-y-4">
         {currentDesign ? (
-          <ApprovalPanel
-            key={currentDesign.id}
-            design={currentDesign}
-          />
+          <>
+            <ApprovalPanel
+              key={currentDesign.id}
+              design={currentDesign}
+            />
+            <ExportInfo />
+          </>
         ) : (
           <Card>
             <CardHeader>
