@@ -111,6 +111,29 @@ export interface Project {
   updatedAt: Date
 }
 
+export interface CodeReviewItem {
+  file: string
+  line?: number
+  severity: 'error' | 'warning' | 'info' | 'suggestion'
+  category: 'security' | 'performance' | 'best-practices' | 'maintainability' | 'accessibility' | 'type-safety'
+  title: string
+  description: string
+  suggestion?: string
+  codeSnippet?: string
+}
+
+export interface CodeReviewResult {
+  reviewId: string
+  overall: {
+    score: number // 0-100
+    summary: string
+    recommendations: string[]
+  }
+  issues: CodeReviewItem[]
+  strengths: string[]
+  createdAt: string
+}
+
 interface AppState {
   // Current tab
   activeTab: 'design' | 'code'
@@ -136,6 +159,16 @@ interface AppState {
   selectedFile: string | null
   setSelectedFile: (file: string | null) => void
   
+  // Code review state
+  currentReview: CodeReviewResult | null
+  setCurrentReview: (review: CodeReviewResult | null) => void
+  
+  isReviewingCode: boolean
+  setIsReviewingCode: (loading: boolean) => void
+  
+  reviewHistory: CodeReviewResult[]
+  addToReviewHistory: (review: CodeReviewResult) => void
+  
   // History
   designHistory: DesignSpec[]
   addToDesignHistory: (design: DesignSpec) => void
@@ -160,6 +193,9 @@ export const useAppStore = create<AppState>()(
       currentProject: null,
       isGeneratingCode: false,
       selectedFile: null,
+      currentReview: null,
+      isReviewingCode: false,
+      reviewHistory: [],
       designHistory: [],
       projects: [],
       sidebarCollapsed: false,
@@ -178,6 +214,18 @@ export const useAppStore = create<AppState>()(
       setIsGeneratingCode: (loading) => set({ isGeneratingCode: loading }),
       
       setSelectedFile: (file) => set({ selectedFile: file }),
+      
+      setCurrentReview: (review) => set({ currentReview: review }),
+      
+      setIsReviewingCode: (loading) => set({ isReviewingCode: loading }),
+      
+      addToReviewHistory: (review) =>
+        set((state) => {
+          const filteredHistory = state.reviewHistory.filter(r => r.reviewId !== review.reviewId)
+          return {
+            reviewHistory: [review, ...filteredHistory].slice(0, 10) // Keep last 10
+          }
+        }),
       
       addToDesignHistory: (design) =>
         set((state) => {

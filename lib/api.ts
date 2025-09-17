@@ -1,4 +1,5 @@
 import { DesignSpec, Project } from './store'
+import type { CodeReviewResult } from '../app/api/review-code/route'
 
 // API configuration
 const API_BASE_URL = '/api'
@@ -106,6 +107,19 @@ function isProjectResponse(data: unknown): data is { project: Project } {
   )
 }
 
+function isReviewResponse(data: unknown): data is { review: CodeReviewResult } {
+  if (typeof data !== 'object' || data === null) {
+    return false
+  }
+  
+  const obj = data as Record<string, unknown>
+  return (
+    'review' in obj &&
+    typeof obj.review === 'object' &&
+    obj.review !== null
+  )
+}
+
 // Design generation API
 export async function generateDesign(prompt: string): Promise<DesignSpec> {
   const response = await apiRequest<{ designSpec: DesignSpec }>(
@@ -132,6 +146,20 @@ export async function generateCode(designSpec: DesignSpec): Promise<Project> {
   )
   
   return response.project
+}
+
+// Code review API
+export async function reviewCode(project: Project): Promise<CodeReviewResult> {
+  const response = await apiRequest<{ review: CodeReviewResult }>(
+    '/review-code',
+    {
+      method: 'POST',
+      body: JSON.stringify({ project }),
+    },
+    isReviewResponse
+  )
+  
+  return response.review
 }
 
 // Utility functions
@@ -188,6 +216,10 @@ export async function generateDesignWithRetry(prompt: string): Promise<DesignSpe
 
 export async function generateCodeWithRetry(designSpec: DesignSpec): Promise<Project> {
   return withRetry(() => generateCode(designSpec))
+}
+
+export async function reviewCodeWithRetry(project: Project): Promise<CodeReviewResult> {
+  return withRetry(() => reviewCode(project))
 }
 
 // Health check

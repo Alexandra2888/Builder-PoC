@@ -4,12 +4,15 @@ import { useAppStore } from '@/lib/store'
 import { useCodeGeneration } from '@/lib/hooks/use-ai'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Code2, FolderTree, Eye, Download, Play } from 'lucide-react'
+import { Code2, FolderTree, Download, Play, Search, Monitor, MessageSquare } from 'lucide-react'
 import { FileExplorer } from './code/file-explorer'
 import { CodeEditor } from './code/code-editor'
 import { PreviewFrame } from './code/preview-frame'
+import { CodeReviewPanel } from './code/code-review-panel'
 import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from 'sonner'
+import { useState } from 'react'
 
 export function CodeTab() {
   const { 
@@ -17,10 +20,13 @@ export function CodeTab() {
     isGeneratingCode, 
     currentDesign,
     selectedFile,
-    setActiveTab
+    setActiveTab,
+    currentReview,
+    isReviewingCode
   } = useAppStore()
 
   const { generateCode } = useCodeGeneration()
+  const [rightPanelTab, setRightPanelTab] = useState<'preview' | 'review'>('preview')
 
   const handleGenerateCode = async () => {
     if (!currentDesign) return
@@ -142,6 +148,19 @@ export function CodeTab() {
           <p className="text-sm text-muted-foreground">{currentProject.description}</p>
         </div>
         <div className="flex items-center gap-2">
+          {/* Review Status Indicator */}
+          {currentReview && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground mr-2">
+              <MessageSquare className="h-4 w-4" />
+              <span>Score: {currentReview.overall.score}/100</span>
+              {currentReview.issues.length > 0 && (
+                <span className="text-orange-600">
+                  • {currentReview.issues.length} issues
+                </span>
+              )}
+            </div>
+          )}
+          
           <Button variant="default" size="sm" onClick={handleDownloadProject}>
             <Download className="mr-2 h-4 w-4" />
             Download
@@ -184,14 +203,41 @@ export function CodeTab() {
 
         <PanelResizeHandle />
 
-        {/* Preview */}
-        <Panel defaultSize={30} minSize={20}>
-          <div className="h-full p-4">
-            <div className="flex items-center gap-2 mb-4">
-              <Eye className="h-4 w-4" />
-              <span className="font-medium">Live Preview</span>
-            </div>
-            <PreviewFrame project={currentProject} />
+        {/* Right Panel - Preview & Review */}
+        <Panel defaultSize={30} minSize={25}>
+          <div className="h-full flex flex-col">
+            <Tabs 
+              value={rightPanelTab} 
+              onValueChange={(value) => setRightPanelTab(value as 'preview' | 'review')}
+              className="h-full flex flex-col"
+            >
+              <div className="px-4 pt-4 border-b">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="preview" className="flex items-center gap-2">
+                    <Monitor className="h-4 w-4" />
+                    Preview
+                  </TabsTrigger>
+                  <TabsTrigger value="review" className="flex items-center gap-2 relative">
+                    <Search className="h-4 w-4" />
+                    Review
+                    {isReviewingCode && (
+                      <div className="absolute -top-1 -right-1 h-2 w-2 bg-blue-500 rounded-full animate-pulse" />
+                    )}
+                    {currentReview && currentReview.issues.length > 0 && (
+                      <div className="absolute -top-1 -right-1 h-2 w-2 bg-orange-500 rounded-full" />
+                    )}
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+              
+              <TabsContent value="preview" className="flex-1 p-4 m-0">
+                <PreviewFrame project={currentProject} />
+              </TabsContent>
+              
+              <TabsContent value="review" className="flex-1 m-0">
+                <CodeReviewPanel />
+              </TabsContent>
+            </Tabs>
           </div>
         </Panel>
       </PanelGroup>
