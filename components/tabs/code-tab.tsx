@@ -9,6 +9,7 @@ import { FileExplorer } from './code/file-explorer'
 import { CodeEditor } from './code/code-editor'
 import { PreviewFrame } from './code/preview-frame'
 import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels'
+import { toast } from 'sonner'
 
 export function CodeTab() {
   const { 
@@ -26,11 +27,42 @@ export function CodeTab() {
     await generateCode()
   }
 
-  const handleDownloadProject = () => {
+  const handleDownloadProject = async () => {
     if (!currentProject) return
     
-    // TODO: Implement project download
-    console.log('Downloading project:', currentProject.id)
+    try {
+      toast.loading('Preparing project download...', { id: 'project-download' })
+      
+      const response = await fetch('/api/export-project', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          project: currentProject
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to export project')
+      }
+
+      // Create download link
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `${currentProject.name.toLowerCase().replace(/\s+/g, '-')}-project.zip`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+      
+      toast.success('Project downloaded successfully!', { id: 'project-download' })
+    } catch (error) {
+      console.error('Download failed:', error)
+      toast.error('Failed to download project. Please try again.', { id: 'project-download' })
+    }
   }
 
   // If no design is approved yet
@@ -110,13 +142,9 @@ export function CodeTab() {
           <p className="text-sm text-muted-foreground">{currentProject.description}</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={handleDownloadProject}>
+          <Button variant="default" size="sm" onClick={handleDownloadProject}>
             <Download className="mr-2 h-4 w-4" />
             Download
-          </Button>
-          <Button size="sm">
-            <Eye className="mr-2 h-4 w-4" />
-            Deploy
           </Button>
         </div>
       </div>

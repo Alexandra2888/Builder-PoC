@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardContent } from '@/components/ui/card'
-import { Info, FileText, Image } from 'lucide-react'
+import { Info, FileText, Image} from 'lucide-react'
 
 export function ExportInfo() {
   return (
@@ -13,7 +13,7 @@ export function ExportInfo() {
             <p className="font-medium text-foreground mb-1">About Export Formats:</p>
             <div className="space-y-2">
               <div className="flex items-start gap-2">
-                <Image className="h-3 w-3 mt-0.5 flex-shrink-0"  />
+                <Image className="h-3 w-3 mt-0.5 flex-shrink-0" />
                 <div>
                   <span className="font-medium">SVG Export:</span> Creates a scalable vector file that can be imported into most design tools. This is Figma&apos;s recommended format for sharing designs externally.
                 </div>
