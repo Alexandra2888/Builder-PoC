@@ -9,9 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@langchain/anthropic": "^0.3.28",
+    "@langchain/anthropic": "^1.3.22",
     "@langchain/community": "^0.3.56",
-    "@langchain/core": "^0.3.76",
+    "@langchain/core": "^1.1.30",
     "@monaco-editor/react": "^4.7.0",
     "@radix-ui/react-collapsible": "^1.1.12",
     "@radix-ui/react-dialog": "^1.1.15",

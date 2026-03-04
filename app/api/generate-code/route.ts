@@ -1,16 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { ChatAnthropic } from '@langchain/anthropic'
-import { PromptTemplate } from '@langchain/core/prompts'
-import { StringOutputParser } from '@langchain/core/output_parsers'
-import { RunnableSequence } from '@langchain/core/runnables'
+import { NextRequest, NextResponse } from "next/server";
+import { ChatAnthropic } from "@langchain/anthropic";
+import { PromptTemplate } from "@langchain/core/prompts";
+import { StringOutputParser } from "@langchain/core/output_parsers";
+import { RunnableSequence } from "@langchain/core/runnables";
 
 // Initialize Anthropic model
 const model = new ChatAnthropic({
-  anthropicApiKey: process.env.ANTHROPIC_API_KEY,
-  modelName: 'claude-3-5-sonnet-20241022',
-  temperature: 0.3, // Lower temperature for more consistent code generation
+  apiKey: process.env.ANTHROPIC_API_KEY,
+  model: "claude-sonnet-4-6",
+  temperature: 0.3,
   maxTokens: 8000,
-})
+});
 
 // Code generation prompt template
 const codePrompt = PromptTemplate.fromTemplate(`
@@ -74,118 +74,133 @@ Make sure to:
 - Make it pixel-perfect to the design specification
 
 Respond with ONLY the JSON format, no additional text or explanation.
-`)
+`);
 
 // Create the code generation chain
 const codeChain = RunnableSequence.from([
   codePrompt,
   model,
-  new StringOutputParser()
-])
+  new StringOutputParser(),
+]);
 
 export async function POST(request: NextRequest) {
   try {
-    const { designSpec } = await request.json()
+    const { designSpec } = await request.json();
 
-    if (!designSpec || typeof designSpec !== 'object') {
+    if (!designSpec || typeof designSpec !== "object") {
       return NextResponse.json(
-        { error: 'Valid design specification is required' },
-        { status: 400 }
-      )
+        { error: "Valid design specification is required" },
+        { status: 400 },
+      );
     }
 
     if (!process.env.ANTHROPIC_API_KEY) {
       return NextResponse.json(
-        { error: 'Anthropic API key is not configured' },
-        { status: 500 }
-      )
+        { error: "Anthropic API key is not configured" },
+        { status: 500 },
+      );
     }
 
     // Generate code
-    const result = await codeChain.invoke({ 
-      designSpec: JSON.stringify(designSpec, null, 2) 
-    })
-    
+    const result = await codeChain.invoke({
+      designSpec: JSON.stringify(designSpec, null, 2),
+    });
+
     // Parse the JSON response
-    let projectData
+    let projectData;
     try {
       // Clean the response (remove any markdown formatting)
-      const cleanedResult = result.replace(/```json\n?|\n?```/g, '').trim()
-      projectData = JSON.parse(cleanedResult)
+      const cleanedResult = result.replace(/```json\n?|\n?```/g, "").trim();
+      projectData = JSON.parse(cleanedResult);
     } catch (parseError) {
-      console.error('Failed to parse AI response:', parseError)
-      console.error('AI Response:', result)
+      console.error("Failed to parse AI response:", parseError);
+      console.error("AI Response:", result);
       return NextResponse.json(
-        { error: 'Failed to parse AI response. Please try again.' },
-        { status: 500 }
-      )
+        { error: "Failed to parse AI response. Please try again." },
+        { status: 500 },
+      );
     }
 
     // Validate required fields
     if (!projectData.files || !Array.isArray(projectData.files)) {
       return NextResponse.json(
-        { error: 'AI response missing required files array' },
-        { status: 500 }
-      )
+        { error: "AI response missing required files array" },
+        { status: 500 },
+      );
     }
 
     // Validate file structure
-    const requiredFiles = ['app/layout.tsx', 'app/page.tsx', 'package.json']
-    const generatedPaths = projectData.files.map((f: { path: string }) => f.path)
-    const missingFiles = requiredFiles.filter(path => !generatedPaths.includes(path))
-    
+    const requiredFiles = ["app/layout.tsx", "app/page.tsx", "package.json"];
+    const generatedPaths = projectData.files.map(
+      (f: { path: string }) => f.path,
+    );
+    const missingFiles = requiredFiles.filter(
+      (path) => !generatedPaths.includes(path),
+    );
+
     if (missingFiles.length > 0) {
-      console.warn('Missing some required files:', missingFiles)
+      console.warn("Missing some required files:", missingFiles);
     }
 
     // Enhance the project data
     const project = {
       id: `project-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      name: projectData.projectName || 'Generated App',
-      description: projectData.description || 'AI-generated Next.js application',
-      files: projectData.files.map((file: { path: string; content: string; type?: string }) => ({
-        path: file.path,
-        content: file.content,
-        type: file.type || 'component'
-      })),
+      name: projectData.projectName || "Generated App",
+      description:
+        projectData.description || "AI-generated Next.js application",
+      files: projectData.files.map(
+        (file: { path: string; content: string; type?: string }) => ({
+          path: file.path,
+          content: file.content,
+          type: file.type || "component",
+        }),
+      ),
       designSpec,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
+      updatedAt: new Date().toISOString(),
+    };
 
-    return NextResponse.json({ project })
-
+    return NextResponse.json({ project });
   } catch (error) {
-    console.error('Code generation error:', error)
-    
+    console.error("Code generation error:", error);
+
     // Handle specific error types
-    if (error instanceof Error && error.message.includes('API key')) {
+    if (error instanceof Error && error.message.includes("API key")) {
       return NextResponse.json(
-        { error: 'Authentication failed. Please check your API configuration.' },
-        { status: 401 }
-      )
-    }
-    
-    if (error instanceof Error && error.message.includes('rate limit')) {
-      return NextResponse.json(
-        { error: 'Rate limit exceeded. Please try again later.' },
-        { status: 429 }
-      )
+        {
+          error: "Authentication failed. Please check your API configuration.",
+        },
+        { status: 401 },
+      );
     }
 
-    if (error instanceof Error && error.message.includes('context_length')) {
+    if (error instanceof Error && error.message.includes("rate limit")) {
       return NextResponse.json(
-        { error: 'Design specification too complex. Please try a simpler design.' },
-        { status: 400 }
-      )
+        { error: "Rate limit exceeded. Please try again later." },
+        { status: 429 },
+      );
+    }
+
+    if (error instanceof Error && error.message.includes("context_length")) {
+      return NextResponse.json(
+        {
+          error:
+            "Design specification too complex. Please try a simpler design.",
+        },
+        { status: 400 },
+      );
     }
 
     return NextResponse.json(
-      { 
-        error: 'An unexpected error occurred while generating code. Please try again.',
-        details: process.env.NODE_ENV === 'development' ? error?.toString() : undefined
+      {
+        error:
+          "An unexpected error occurred while generating code. Please try again.",
+        details:
+          process.env.NODE_ENV === "development"
+            ? error?.toString()
+            : undefined,
       },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }
