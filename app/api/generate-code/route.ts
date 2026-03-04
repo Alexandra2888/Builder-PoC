@@ -9,7 +9,8 @@ const model = new ChatAnthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
   model: "claude-sonnet-4-6",
   temperature: 0.3,
-  maxTokens: 8000,
+  maxTokens: 32000,
+  streaming: true,
 });
 
 // Code generation prompt template
@@ -109,12 +110,30 @@ export async function POST(request: NextRequest) {
     // Parse the JSON response
     let projectData;
     try {
-      // Clean the response (remove any markdown formatting)
-      const cleanedResult = result.replace(/```json\n?|\n?```/g, "").trim();
-      projectData = JSON.parse(cleanedResult);
+      let cleanedResult = result.replace(/```json\n?|\n?```/g, "").trim();
+
+      try {
+        projectData = JSON.parse(cleanedResult);
+      } catch {
+        // Attempt repair for truncated JSON
+        cleanedResult = cleanedResult.replace(/,\s*$/, "");
+        const openBraces =
+          (cleanedResult.match(/{/g) || []).length -
+          (cleanedResult.match(/}/g) || []).length;
+        const openBrackets =
+          (cleanedResult.match(/\[/g) || []).length -
+          (cleanedResult.match(/]/g) || []).length;
+        cleanedResult = cleanedResult.replace(
+          /,?\s*"[^"]*"\s*:\s*("(?:[^"\\]|\\.)*)?$/,
+          "",
+        );
+        cleanedResult += "]".repeat(Math.max(0, openBrackets));
+        cleanedResult += "}".repeat(Math.max(0, openBraces));
+        projectData = JSON.parse(cleanedResult);
+      }
     } catch (parseError) {
       console.error("Failed to parse AI response:", parseError);
-      console.error("AI Response:", result);
+      console.error("AI Response (last 500 chars):", result.slice(-500));
       return NextResponse.json(
         { error: "Failed to parse AI response. Please try again." },
         { status: 500 },
